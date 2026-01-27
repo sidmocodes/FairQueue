@@ -41,11 +41,11 @@ public class TokenService {
     }
     
     public Claims validateAndParse(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+        return Jwts.parser()
+                .verifyWith(secretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
     
     public String generateAdmissionPass(String userId, String eventId, long validitySeconds) {
