@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fairqueue-postgres
+    environment:
+      POSTGRES_DB: fairqueue
+      POSTGRES_USER: fairqueue
+      POSTGRES_PASSWORD: fairqueue
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fairqueue"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fairqueue-network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: fairqueue-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fairqueue-network
+
+  # Admission Gateway
+  admission-gateway:
+    build:
+      context: .
+      dockerfile: admission-gateway/Dockerfile
+    container_name: fairqueue-admission-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_SERVICE_URL: http://queue-service:8081
+      TOKEN_SECRET: productionSecretKeyChangeThis123456789012345678901234567890
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - fairqueue-network
+    restart: unless-stopped
+
+  # Queue Service
+  queue-service:
+    build:
+      context: .
+      dockerfile: queue-service/Dockerfile
+    container_name: fairqueue-queue-service
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      TOKEN_SECRET: productionSecretKeyChangeThis123456789012345678901234567890
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - fairqueue-network
+    restart: unless-stopped
+
+  # Admission Slot Service
+  admission-slot-service:
+    build:
+      context: .
+      dockerfile: admission-slot-service/Dockerfile
+    container_name: fairqueue-admission-slot
+    ports:
+      - "8082:8082"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/fairqueue
+      DATABASE_USERNAME: fairqueue
+      DATABASE_PASSWORD: fairqueue
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      TOKEN_SECRET: productionSecretKeyChangeThis123456789012345678901234567890
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fairqueue-network
+    restart: unless-stopped
+
+  # Booking Gate
+  booking-gate:
+    build:
+      context: .
+      dockerfile: booking-gate/Dockerfile
+    container_name: fairqueue-booking-gate
+    ports:
+      - "8083:8083"
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/fairqueue
+      DATABASE_USERNAME: fairqueue
+      DATABASE_PASSWORD: fairqueue
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ADMISSION_SERVICE_URL: http://admission-slot-service:8082
+      TOKEN_SECRET: productionSecretKeyChangeThis123456789012345678901234567890
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fairqueue-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  fairqueue-network:
+    driver: bridge
