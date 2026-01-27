@@ -1,0 +1,76 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-audit-logs-table
+      author: fairqueue
+      changes:
+        - createTable:
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_audit_logs
+              - column:
+                  name: user_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: pass_id
+                  type: VARCHAR(255)
+              - column:
+                  name: details
+                  type: TEXT
+              - column:
+                  name: correlation_id
+                  type: VARCHAR(255)
+        - createIndex:
+            indexName: idx_user_id
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            indexName: idx_event_id
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: event_id
+        - createIndex:
+            indexName: idx_timestamp
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: timestamp
+        - createIndex:
+            indexName: idx_audit_logs_pass_id
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: pass_id
+        - createIndex:
+            indexName: idx_audit_logs_action
+            tableName: audit_logs
+            columns:
+              - column:
+                  name: action
+      rollback:
+        - dropTable:
+            tableName: audit_logs
