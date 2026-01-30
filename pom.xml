@@ -27,6 +27,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.cloud.version>2023.0.0</spring.cloud.version>
         <jjwt.version>0.12.3</jjwt.version>
+        <testcontainers.version>1.19.3</testcontainers.version>
+        <byte-buddy.version>1.15.11</byte-buddy.version>
     </properties>
 
     <modules>
@@ -62,6 +64,23 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jjwt.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
