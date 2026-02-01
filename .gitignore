@@ -26,3 +26,8 @@ logs/
 # Environment
 .env
 .env.local
+
+# Documentation (kept locally only)
+docs/
+*.md
+!README.md

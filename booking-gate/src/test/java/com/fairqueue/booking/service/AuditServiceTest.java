@@ -1,4 +1,4 @@
-package com.fairqueue.booking.service;
+Dpackage com.fairqueue.booking.service;
 
 import com.fairqueue.booking.entity.AuditLog;
 import com.fairqueue.booking.repository.AuditLogRepository;

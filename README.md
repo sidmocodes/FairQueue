@@ -2,6 +2,11 @@
 
 A production-grade distributed queue management and admission-control service for high-demand ticketing platforms.
 
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-71%20passing-brightgreen)
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-green)
+
 ## Architecture
 
 FairQueue is built as a microservices architecture with four core services:
@@ -624,6 +629,41 @@ docker cp fairqueue-redis:/data/dump.rdb ./redis-backup.rdb
 4. **Advanced Fraud Detection**
    - Bot detection
    - Device fingerprinting
+
+## Testing
+
+### Test Coverage
+- **Total Tests**: 71 passing
+- **FairQueue Common**: 20 tests
+- **Admission Gateway**: 13 tests
+- **Queue Service**: 12 tests
+- **Admission Slot Service**: 17 tests
+- **Booking Gate**: 9 tests
+
+### Running Tests
+
+**All tests:**
+```bash
+mvn clean test
+```
+
+**Specific module:**
+```bash
+cd admission-gateway
+mvn test
+```
+
+**Test Features:**
+- Unit tests with Mockito
+- Service-level testing
+- Edge case validation
+- Concurrent access testing
+- Error handling verification
+
+### Build Requirements
+- **Java**: 17 (OpenJDK Temurin)
+- **Maven**: 3.8+
+- **ByteBuddy**: 1.15.11 (for Java 17+ support)
 
 ## License
 
